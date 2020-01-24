@@ -11,14 +11,14 @@ let addresses = {
         timeLeft: "/cob/fms/time-left",
         isRed: "/FMSInfo/IsRedAlliance",
     },
-    mode: "cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Disabled
+    mode: "cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Climb, 5 = Disabled
 }
 
 function initAllDatapoints(){
     NetworkTables.putValue(addresses.location.rotation, 0);
     NetworkTables.putValue(addresses.fms.timeLeft, 180);
     NetworkTables.putValue(addresses.fms.isRed, false);
-    NetworkTables.putValue(addresses.mode, 4);
+    NetworkTables.putValue(addresses.mode, 5);
 }
 
 let ui = {
@@ -137,6 +137,8 @@ function renderTimer(){
     }else if (mode === 3){
         ui.timer.mode.innerText = "Vision";
     }else if (mode === 4){
+        ui.timer.mode.innerText = "Climb";
+    }else if (mode === 5){
         ui.timer.mode.innerText = "Disabled";
     }
     if(ui.timer.canvas == null){
