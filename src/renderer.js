@@ -11,7 +11,11 @@ let addresses = {
         timeLeft: "/cob/fms/time-left",
         isRed: "/FMSInfo/IsRedAlliance",
     },
+    
     mode: "cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Climb, 5 = Disabled
+    actions:   {
+        gyroReset: "/cob/actions/gyroReset", 
+    }
 }
 
 function initAllDatapoints(){
@@ -19,6 +23,7 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.fms.timeLeft, 180);
     NetworkTables.putValue(addresses.fms.isRed, false);
     NetworkTables.putValue(addresses.mode, 5);
+    NetworkTables.putValue(addresses.action.gyroReset, false);
 }
 
 let ui = {
@@ -30,6 +35,7 @@ let ui = {
     },
     robot: {
         image : document.getElementById('robot'),
+        button : document.getElementById('gyroreset'),
     },
 	connecter: {
 		address: document.getElementById('connect-address'),
@@ -119,6 +125,12 @@ function renderRobot(){
     angle = (angle + 360) % 360
     ui.robot.image.style.transform = "rotate("+ angle +"deg)"
 }
+
+ui.robot.button.onclick = () => {
+    NetworkTables.putValue("" + addresses.actions.gyroReset, true)
+}
+
+
 
 function renderTimer(){
     
