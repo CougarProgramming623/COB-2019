@@ -23,7 +23,7 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.fms.timeLeft, 180);
     NetworkTables.putValue(addresses.fms.isRed, false);
     NetworkTables.putValue(addresses.mode, 5);
-    NetworkTables.putValue(addresses.action.gyroReset, false);
+    NetworkTables.putValue(addresses.actions.gyroReset, false);
 }
 
 let ui = {
@@ -127,6 +127,7 @@ function renderRobot(){
 }
 
 ui.robot.button.onclick = () => {
+    let gyroReset = NetworkTables.getValue("" + addresses.actions.gyroreset);
     NetworkTables.putValue("" + addresses.actions.gyroReset, true)
 }
 
