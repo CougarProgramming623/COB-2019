@@ -154,6 +154,7 @@ function renderTimer(){
     }else if (mode === 5){
         ui.timer.mode.innerText = "Disabled";
     }
+
     if(ui.timer.canvas == null){
         console.log("unable to render timer due to contnt undefined")
         return
@@ -252,11 +253,11 @@ function addNetworkTables(){
     })
 
     NetworkTables.addKeyListener('' + addresses.fms.isRed,()=>{
-    renderTimer();
+        renderTimer();
     })
     NetworkTables.addKeyListener('' + addresses.mode,()=>{
         renderTimer();
-        })
+    })
 }
 addNetworkTables();
 fullRender()
