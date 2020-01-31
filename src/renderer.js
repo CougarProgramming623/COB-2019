@@ -12,7 +12,7 @@ let addresses = {
         isRed: "/FMSInfo/IsRedAlliance",
     },
     
-    mode: "cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Climb, 5 = Disabled
+    mode: "/cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Climb, 5 = Disabled
     actions:   {
         gyroReset: "/cob/actions/gyroReset", 
     }
@@ -140,7 +140,8 @@ function renderTimer(){
         return
     }
     //Mode Identifier
-    let mode = NetworkTables.getValue("" + addresses.mode);
+    let mode = NetworkTables.getValue('' + addresses.mode, 6);
+    console.log("mode: " + mode)
     if (mode === 0){
         ui.timer.mode.innerText = "Field Oriented";
     }else if (mode === 1){
@@ -153,6 +154,8 @@ function renderTimer(){
         ui.timer.mode.innerText = "Climb";
     }else if (mode === 5){
         ui.timer.mode.innerText = "Disabled";
+    } else {
+        console.log("mode is not a valid value: " + mode)
     }
 
     if(ui.timer.canvas == null){
@@ -161,7 +164,7 @@ function renderTimer(){
     }
     // console.log("called renderTimer()")
     let time = NetworkTables.getValue('' + addresses.fms.timeLeft)
-    console.log(time);
+    //console.log(time);
     time = Math.floor(time);
     let isRed = NetworkTables.getValue('' + addresses.fms.isRed)
     if(isRed == 'true'){
