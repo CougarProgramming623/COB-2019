@@ -20,7 +20,7 @@ let addresses = {
 
 function initAllDatapoints(){
     NetworkTables.putValue(addresses.location.rotation, 0);
-    NetworkTables.putValue(addresses.fms.timeLeft, 180);
+    NetworkTables.putValue(addresses.fms.timeLeft, 135);
     NetworkTables.putValue(addresses.fms.isRed, false);
     NetworkTables.putValue(addresses.mode, 5);
     NetworkTables.putValue(addresses.actions.gyroReset, false);
@@ -183,7 +183,10 @@ function renderTimer(){
     ct.beginPath();
     ct.arc(max/2,max/2, max/2, 0, 2 * Math.PI);
     ct.fill();
-    let amountToFill = time / 180.0//3 minutes
+    let amountToFill = time / 135.0//2 minutes 15 seconds
+    if (mode === 2){
+        amountToFill = time / 15.0//15 second auto
+    }
     let archToFill = amountToFill * (2 * Math.PI)//amountToFill should be 0 <= x <= 1 so this should fall under 0 <= x <= (2*PI)
     if (isFlashing){ 
         ct.fillStyle = '#D4AC0D';
@@ -201,7 +204,11 @@ function renderTimer(){
     ct.fillStyle = 'white'
     ct.textAlign = "center";
 
-    let text = '' + Math.floor(time/60) + ':' + Math.floor(time%60)
+    let seconds = '' + Math.floor(time%60)
+    if (seconds.length === 1){
+        seconds = '0' + seconds
+    }
+    let text = '' + Math.floor(time/60) + ':' + seconds
     ct.fillText(text, max/2, max/2+20);//30px text, 15px ajustment?
 
     // console.log(NetworkTables.getValue('' + addresses.robot.isField))
