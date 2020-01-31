@@ -88,6 +88,9 @@ ipc.on('add', (ev, mesg) => {
 ipc.on('update', (ev, mesg) => {
   client.Update(mesg.id, mesg.val);
 });
+ipc.on('delete', (ev, mesg) => {
+  client.Delete(mesg.id)
+})
 
   // and load the index.html of the app.
   // win.loadFile('index.html')

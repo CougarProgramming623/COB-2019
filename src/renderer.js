@@ -13,8 +13,14 @@ let addresses = {
     },
     
     mode: "/cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Climb, 5 = Disabled
-    actions:   {
+    /*actions:   {
         gyroReset: "/cob/actions/gyroReset", 
+    }*/
+}
+
+let messages = {
+    cob : {
+        ping: "/cob/messages/cob/ping"
     }
 }
 
@@ -23,7 +29,8 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.fms.timeLeft, 135);
     NetworkTables.putValue(addresses.fms.isRed, false);
     NetworkTables.putValue(addresses.mode, 5);
-    NetworkTables.putValue(addresses.actions.gyroReset, false);
+    //NetworkTables.putValue(addresses.actions.gyroReset, false);
+    NetworkTables.putValue(messages.ping, null)
 }
 
 let ui = {
@@ -35,7 +42,7 @@ let ui = {
     },
     robot: {
         image : document.getElementById('robot'),
-        button : document.getElementById('gyroreset'),
+        //button : document.getElementById('gyroreset'),
     },
 	connecter: {
 		address: document.getElementById('connect-address'),
@@ -126,12 +133,10 @@ function renderRobot(){
     ui.robot.image.style.transform = "rotate("+ angle +"deg)"
 }
 
-ui.robot.button.onclick = () => {
-    let gyroReset = NetworkTables.getValue("" + addresses.actions.gyroreset);
-    NetworkTables.putValue("" + addresses.actions.gyroReset, true)
-}
-
-
+//ui.robot.button.onclick = () => {
+    //let gyroReset = NetworkTables.getValue("" + addresses.actions.gyroreset);
+    //NetworkTables.putValue("" + addresses.actions.gyroReset, true)
+//}
 
 function renderTimer(){
     
@@ -214,43 +219,6 @@ function renderTimer(){
     // console.log(NetworkTables.getValue('' + addresses.robot.isField))
 }
 
-function rectange(){
-    return {
-        a: {x:0,y:0},
-        b: {x:0,y:0},
-        c: {x:0,y:0},
-        d: {x:0,y:0}
-    }
-}
-
-function renderRotatedRectangle(ct,ver,rot,x,y){
-    let rotation = function(x,y,sin,cos,addX,addY){
-        let obj = {}
-        obj.x = (x*cos - y*sin) + addX
-        obj.y = (x*sin + y*cos) + addY
-        return obj
-    }
-
-    let sin = sinM(rot)
-    let cos = cosM(rot)
-
-    let a1 = rotation(ver.a.x,ver.a.y,sin,cos,x,y)
-    ver.a = a1
-    let b1 = rotation(ver.b.x,ver.b.y,sin,cos,x,y)
-    ver.b = b1
-    let c1 = rotation(ver.c.x,ver.c.y,sin,cos,x,y)
-    ver.c = c1
-    let d1 = rotation(ver.d.x,ver.d.y,sin,cos,x,y)
-    ver.d = d1
-    ct.beginPath()
-    ct.moveTo(a1.x,a1.y)
-    ct.lineTo(b1.x,b1.y)
-    ct.lineTo(c1.x,c1.y)
-    ct.lineTo(d1.x,d1.y)
-    ct.lineTo(a1.x,a1.y)
-    ct.fill()
-}
-
 function addNetworkTables(){
 
     NetworkTables.addKeyListener('' + addresses.fms.timeLeft,()=>{
@@ -268,6 +236,16 @@ function addNetworkTables(){
     NetworkTables.addKeyListener('' + addresses.mode,()=>{
         renderTimer();
     })
+    setMessageListener("ping", (value) => console.log("message from robot:" + value));
+
 }
+
+function setMessageListener(path, func) {
+    NetworkTables.addKeyListener('/cob/messages/cob/' + path,(key,value)=>{
+        func(value)
+        NetworkTables.delete(key)
+    })
+}
+
 addNetworkTables();
 fullRender()

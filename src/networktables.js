@@ -169,6 +169,9 @@ var NetworkTables =
                 }
                 return connected;
             },
+            delete(key) {
+                ipc.send('delete', { key, id: keys[key].id, flags: keys[key].flags });
+            },
             /**
              * Creates a new empty map (or hashtable) object and returns it. The map is safe to store NetworkTables keys in.
              * @returns map object, with forEach/get/has/set functions defined. Simlar to a map object when using d3.js
