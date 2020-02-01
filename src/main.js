@@ -1,22 +1,22 @@
 // Modules to control application life and create native browser window
-'use strict'
-const electron = require('electron')
-const app = electron.app
-const BrowserWindow = electron.BrowserWindow
+'use strict';
+const electron = require('electron');
+const app = electron.app;
+const BrowserWindow = electron.BrowserWindow;
 const ipc = electron.ipcMain;
 
 const wpilib_NT = require('wpilib-nt-client');
 const client = new wpilib_NT.Client();
 
-const DEBUG = false
+const DEBUG = false;
 
 
-let connected,
-    ready = false;
+let connected;
+let ready = false;
 // var ui = require('./ui')
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
-var win
+var win;
 
 let clientDataListener = (key, val, valType, mesgType, id, flags) => {
   if (val === 'true' || val === 'false') {
@@ -42,8 +42,8 @@ function createWindow () {
     webPreferences: {
       nodeIntegration: true
     }
-  })
-  win.setPosition(0,0)
+  });
+  win.setPosition(0,0);
   client.start((con, err) => {
     // If the Window is ready than send the connection status to it
     if (ready) {
@@ -66,11 +66,10 @@ ipc.on('ready', (ev, mesg) => {
 });
 // When the user chooses the address of the bot than try to connect
 ipc.on('connect', (ev, address, port) => {
-
   let callback = (connected, err) => {
       try{
         win.webContents.send('connected', connected); //throws error ere
-      } catch(e){return;}
+      } catch(e){/*just ignore all errors lmao*/}
   };
   if (port) {
       client.start(callback, address, port);
@@ -81,7 +80,7 @@ ipc.on('connect', (ev, address, port) => {
 });
 ipc.on('stop-connect', () => {
   client.stop()
-})
+});
 ipc.on('add', (ev, mesg) => {
   client.Assign(mesg.val, mesg.key, (mesg.flags & 1) === 1);
 });
@@ -90,7 +89,7 @@ ipc.on('update', (ev, mesg) => {
 });
 ipc.on('delete', (ev, mesg) => {
   client.Delete(mesg.id)
-})
+});
 
   // and load the index.html of the app.
   // win.loadFile('index.html')
@@ -99,19 +98,19 @@ ipc.on('delete', (ev, mesg) => {
   win.once('ready-to-show', () => {
     win.show();
     win.webContents.send('start')
-  })//don't show until ready
-  win.on('closed', () => { win = null })
-  win.setMenuBarVisibility(false)
+  });//don't show until ready
+  win.on('closed', () => { win = null });
+  win.setMenuBarVisibility(false);
   process.on('uncaughtException', function (err) {
     console.log(err);
-  })
+  });
 
   if(DEBUG){
     win.webContents.openDevTools()
   }
 
 }
-app.on('ready', createWindow)
+app.on('ready', createWindow);
 
 
 //var child = require("child_process");
@@ -123,11 +122,11 @@ app.on('window-all-closed', function () {
   if (process.platform !== 'darwin') {
     app.quit()
   }
-})
+});
 
 app.on('activate', function () {
   // Win should be initulized already, but just in case - osx problem again
   if (win === null) {
     createWindow()
   }
-})
+});
