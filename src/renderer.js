@@ -1,7 +1,6 @@
 
 // const remote = require('electron').remote;
 const ipc = require('electron').ipcRenderer;
-var memoize = require("memoizee");
 
 let addresses = {
     location : {
