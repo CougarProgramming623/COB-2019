@@ -66,11 +66,10 @@ ipc.on('ready', (ev, mesg) => {
 });
 // When the user chooses the address of the bot than try to connect
 ipc.on('connect', (ev, address, port) => {
-
   let callback = (connected, err) => {
       try{
         win.webContents.send('connected', connected); //throws error ere
-      } catch(e){return;}
+      } catch(e){/*just ignore all errors lmao*/}
   };
   if (port) {
       client.start(callback, address, port);

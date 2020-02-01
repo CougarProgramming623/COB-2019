@@ -13,9 +13,6 @@ let addresses = {
     },
     
     mode: "/cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Climb, 5 = Disabled
-    /*actions:   {
-        gyroReset: "/cob/actions/gyroReset", 
-    }*/
 };
 
 let messages = {
@@ -35,7 +32,7 @@ function initAllDatapoints(){
 
 let ui = {
     rotation : document.getElementById('rotation'),
-    timeleft: document.getElementById('timeleft'),
+    timeLeft: document.getElementById('timeLeft'),
     timer: {
         canvas : document.getElementById('timer'),
         mode : document.getElementById("robot-mode"),
@@ -51,21 +48,10 @@ let ui = {
 	}
 };
 
-//memoizeation
-var sine = function(rot) {
-    return Math.sin(Math.floor(rot) * (Math.PI/180))
-};
-var cos = function(rot) {
-    return Math.cos(Math.floor(rot) * (Math.PI/180))
-};
-
-let sinM = memoize(sine);
-let cosM = memoize(cos);
-
 NetworkTables.addRobotConnectionListener(onRobotConnection, false);
 
 function onRobotConnection(connected) {
-	var state = connected ? 'Robot connected!' : 'Robot disconnected.';
+	const state = connected ? 'Robot connected!' : 'Robot disconnected.';
 	let address = ui.connecter.address;
 	let connect = ui.connecter.connect;
 	console.log(state);
@@ -94,7 +80,7 @@ function onRobotConnection(connected) {
 		connect.firstChild.data = 'Connect';
 		// CHANGE THIS VALUE TO YOUR ROBOT'S IP ADDRESS
 	// address.value = 'roborio-62X-frc.local';
-     address.value = '10.6.2X.2';
+        address.value = '10.6.2X.2';
 		address.focus();
         address.setSelectionRange(6,7);
 
@@ -129,14 +115,9 @@ function renderRobot(){
     }
 
     let angle = NetworkTables.getValue('' + addresses.location.rotation);
-    angle = (angle + 360) % 360
+    angle = (angle + 360) % 360;
     ui.robot.image.style.transform = "rotate("+ angle +"deg)"
 }
-
-//ui.robot.button.onclick = () => {
-    //let gyroReset = NetworkTables.getValue("" + addresses.actions.gyroreset);
-    //NetworkTables.putValue("" + addresses.actions.gyroReset, true)
-//}
 
 function renderTimer(){
     
@@ -206,7 +187,7 @@ function renderTimer(){
 
     //do the text
     ct.font = "75px Monospace";
-    ct.fillStyle = 'white'
+    ct.fillStyle = 'white';
     ct.textAlign = "center";
 
     let seconds = '' + Math.floor(time%60);
@@ -224,7 +205,6 @@ function addNetworkTables(){
     NetworkTables.addKeyListener('' + addresses.fms.timeLeft,()=>{
         renderTimer();
     },false);
-
 
     NetworkTables.addKeyListener('' + addresses.location.rotation,()=>{
         renderRobot();
