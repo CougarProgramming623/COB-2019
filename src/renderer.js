@@ -21,6 +21,9 @@ let addresses = {
 let messages = {
     cob : {
         ping: "/cob/messages/cob/ping"
+    },
+    roborio : {
+        gnip: "/cob/messages/roborio/gnip"
     }
 }
 
@@ -31,6 +34,7 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.mode, 5);
     //NetworkTables.putValue(addresses.actions.gyroReset, false);
     NetworkTables.putValue(messages.ping, null)
+    NetworkTables.putValue(messages.roborio, null)
 }
 
 let ui = {
@@ -246,6 +250,12 @@ function setMessageListener(path, func) {
         NetworkTables.delete(key)
     })
 }
+
+function sendMessage(path, value){
+    NetworkTables.putValue('/cob/messages/roborio/' + path, value)
+}
+
+sendMessage("gnip", "i love strings")
 
 addNetworkTables();
 fullRender()
