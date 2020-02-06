@@ -10,8 +10,11 @@ let addresses = {
         timeLeft: "/cob/fms/time-left",
         isRed: "/FMSInfo/IsRedAlliance",
     },
-    
     mode: "/cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Climb, 5 = Disabled
+    flywheel: {
+        wu: "/cob/flywheel/wu",
+        flywheelImage: "/cob/flywheel/image",
+    }
 };
 
 let messages = {
@@ -29,8 +32,10 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.fms.isRed, false);
     NetworkTables.putValue(addresses.mode, 5);
     //NetworkTables.putValue(addresses.actions.gyroReset, false);
-    NetworkTables.putValue(messages.ping, null)
-    NetworkTables.putValue(messages.roborio, null)
+    NetworkTables.putValue(messages.ping, null);
+    NetworkTables.putValue(messages.roborio, null);
+    NetworkTables.putValue(addresses.flywheel.wu, 0);
+    NetworkTables.putValue(addresses.flywheel.flywheelImage, false);
 }
 
 let ui = {
@@ -43,6 +48,9 @@ let ui = {
     robot: {
         image : document.getElementById('robot'),
         //button : document.getElementById('gyroreset'),
+        wu : document.getElementById('flywheel-wu'),
+        flywheelImage : document.getElementById("flywheel-img"),
+        flywheelImageOff : document.getElementById("flywheeloff-img"),
     },
 	connecter: {
 		address: document.getElementById('connect-address'),
@@ -120,6 +128,19 @@ function renderRobot(){
     let angle = NetworkTables.getValue('' + addresses.location.rotation);
     angle = (angle + 360) % 360;
     ui.robot.image.style.transform = "rotate("+ angle +"deg)"
+
+    let flywheelStatus = NetworkTables.getValue('' + addresses.flywheel.flywheelImage);
+    if (flywheelStatus === true){
+        ui.robot.wu.innerText = NetworkTables.getValue('' + addresses.flywheel.wu);
+        ui.robot.flywheelImage.style.opacity = 1
+        ui.robot.flywheelImageOff.style.opacity = 0      
+        console.log("Flywheel On")
+    }else if (flywheelStatus === false){
+        ui.robot.wu.innerText = NetworkTables.getValue('' + addresses.flywheel.wu);
+        ui.robot.flywheelImageOff.style.opacity = 1      
+        ui.robot.flywheelImage.style.opacity = 0
+        console.log("Flywheel Off")
+    }
 }
 
 function renderTimer(){
@@ -129,7 +150,7 @@ function renderTimer(){
         return
     }
     //Mode Identifier
-    let mode = NetworkTables.getValue('' + addresses.mode, 6);
+    let mode = NetworkTables.getValue('' + addresses.mode);
     console.log("mode: " + mode);
     if (mode === 0){
         ui.timer.mode.innerText = "Field Oriented";
@@ -218,6 +239,12 @@ function addNetworkTables(){
     });
     NetworkTables.addKeyListener('' + addresses.mode,()=>{
         renderTimer();
+    });
+    NetworkTables.addKeyListener('' + addresses.flywheel.wu,()=>{
+        renderRobot();
+    });
+    NetworkTables.addKeyListener('' + addresses.flywheel.flywheelImage,()=>{
+        renderRobot();
     });
     setMessageListener("ping", (value) => console.log("message from robot:" + value));
 
