@@ -31,9 +31,8 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.fms.timeLeft, 135);
     NetworkTables.putValue(addresses.fms.isRed, false);
     NetworkTables.putValue(addresses.mode, 5);
-    //NetworkTables.putValue(addresses.actions.gyroReset, false);
-    NetworkTables.putValue(messages.ping, null);
-    NetworkTables.putValue(messages.roborio, null);
+    // NetworkTables.putValue(messages.ping, null);
+    // NetworkTables.putValue(messages.roborio, null);
     NetworkTables.putValue(addresses.flywheel.wu, 0);
     NetworkTables.putValue(addresses.flywheel.flywheelImage, false);
 }
@@ -246,7 +245,10 @@ function addNetworkTables(){
     NetworkTables.addKeyListener('' + addresses.flywheel.flywheelImage,()=>{
         renderRobot();
     });
-    setMessageListener("ping", (value) => console.log("message from robot:" + value));
+    setMessageListener("ping", (value) => { 
+        console.log("message from robot:" + value);
+        sendMessage("gnip", "yeet");
+    } );
 
 }
 
@@ -262,6 +264,7 @@ function sendMessage(path, value){
 }
 
 sendMessage("gnip", "i love strings")
+console.log("Sent Message")
 
 addNetworkTables();
 fullRender();
