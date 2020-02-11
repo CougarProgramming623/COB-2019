@@ -11,6 +11,7 @@ let addresses = {
         isRed: "/FMSInfo/IsRedAlliance",
     },
     mode: "/cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Climb, 5 = Disabled
+    lemons: "/cob/lemons",
     flywheel: {
         wu: "/cob/flywheel/wu",
         flywheelImage: "/cob/flywheel/image",
@@ -35,6 +36,7 @@ function initAllDatapoints(){
     // NetworkTables.putValue(messages.roborio, null);
     NetworkTables.putValue(addresses.flywheel.wu, 0);
     NetworkTables.putValue(addresses.flywheel.flywheelImage, false);
+    NetworkTables.putValue(addresses.lemons, false);
 }
 
 let ui = {
@@ -50,6 +52,7 @@ let ui = {
         wu : document.getElementById('flywheel-wu'),
         flywheelImage : document.getElementById("flywheel-img"),
         flywheelImageOff : document.getElementById("flywheeloff-img"),
+        lemon : document.getElementById("lemons-img")
     },
 	connecter: {
 		address: document.getElementById('connect-address'),
@@ -133,12 +136,17 @@ function renderRobot(){
         ui.robot.wu.innerText = NetworkTables.getValue('' + addresses.flywheel.wu);
         ui.robot.flywheelImage.style.opacity = 1
         ui.robot.flywheelImageOff.style.opacity = 0      
-        console.log("Flywheel On")
     }else if (flywheelStatus === false){
         ui.robot.wu.innerText = NetworkTables.getValue('' + addresses.flywheel.wu);
         ui.robot.flywheelImageOff.style.opacity = 1      
         ui.robot.flywheelImage.style.opacity = 0
-        console.log("Flywheel Off")
+    }
+
+    let lemonStatus = NetworkTables.getValue('' + addresses.lemons);
+    if (lemonStatus === false){
+        ui.robot.lemon.style.opacity = 0
+    }else if (lemonStatus === true){
+        ui.robot.lemon.style.opacity = 1
     }
 }
 
@@ -243,6 +251,9 @@ function addNetworkTables(){
         renderRobot();
     });
     NetworkTables.addKeyListener('' + addresses.flywheel.flywheelImage,()=>{
+        renderRobot();
+    });
+    NetworkTables.addKeyListener('' + addresses.lemons,()=>{
         renderRobot();
     });
     setMessageListener("ping", (value) => { 
