@@ -23,7 +23,8 @@ let messages = {
         ping: "/cob/messages/cob/ping"
     },
     roborio : {
-        gnip: "/cob/messages/roborio/gnip"
+        gnip: "/cob/messages/roborio/gnip",
+        gyroReset: "/cob/messages/roborio/gyroReset"
     }
 };
 
@@ -48,7 +49,7 @@ let ui = {
     },
     robot: {
         image : document.getElementById('robot'),
-        //button : document.getElementById('gyroreset'),
+        gyroReset : document.getElementById('gyroreset'),
         wu : document.getElementById('flywheel-wu'),
         flywheelImage : document.getElementById("flywheel-img"),
         flywheelImageOff : document.getElementById("flywheeloff-img"),
@@ -118,6 +119,11 @@ function onRobotConnection(connected) {
 function fullRender(){
     renderTimer();
     renderRobot();
+}
+
+ui.robot.gyroReset.onclick = () => {
+    console.log("NavX Reset");
+    sendMessage("gyroReset", 'true');
 }
 
 function renderRobot(){
@@ -257,10 +263,12 @@ function addNetworkTables(){
         renderRobot();
     });
     setMessageListener("ping", (value) => { 
-        console.log("message from robot:" + value);
-        sendMessage("gnip", "yeet");
+        console.log("Handshake:" + value);
     } );
-
+    setMessageListener("gyroReset-ack", (value) => {
+        console.log(value);
+        //sendMessage("gyroReset", false);
+    })
 }
 
 function setMessageListener(path, func) {
@@ -274,7 +282,7 @@ function sendMessage(path, value){
     NetworkTables.putValue('/cob/messages/roborio/' + path, value)
 }
 
-sendMessage("gnip", "i love strings")
+sendMessage("gnip", "Hello")
 console.log("Sent Message")
 
 addNetworkTables();
