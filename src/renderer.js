@@ -15,7 +15,8 @@ let addresses = {
     flywheel: {
         wu: "/cob/flywheel/wu",
         flywheelImage: "/cob/flywheel/image",
-    }
+    },
+    auto: "/cob/auto/in-use",
 };
 
 let messages = {
@@ -24,7 +25,8 @@ let messages = {
     },
     roborio : {
         gnip: "/cob/messages/roborio/gnip",
-        gyroReset: "/cob/messages/roborio/gyroReset"
+        gyroReset: "/cob/messages/roborio/gyroReset",
+        setAuto: "/cob/messages/roborio/setAuto",
     }
 };
 
@@ -33,11 +35,10 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.fms.timeLeft, 135);
     NetworkTables.putValue(addresses.fms.isRed, false);
     NetworkTables.putValue(addresses.mode, 5);
-    // NetworkTables.putValue(messages.ping, null);
-    // NetworkTables.putValue(messages.roborio, null);
     NetworkTables.putValue(addresses.flywheel.wu, 0);
     NetworkTables.putValue(addresses.flywheel.flywheelImage, false);
     NetworkTables.putValue(addresses.lemons, false);
+    NetworkTables.putValue(addresses.auto, "unknown");
 }
 
 let ui = {
@@ -53,7 +54,11 @@ let ui = {
         wu : document.getElementById('flywheel-wu'),
         flywheelImage : document.getElementById("flywheel-img"),
         flywheelImageOff : document.getElementById("flywheeloff-img"),
-        lemon : document.getElementById("lemons-img")
+        lemon : document.getElementById("lemons-img"),
+        autoToggle : document.getElementById("auto-toggle"),
+        defaultAuto : document.getElementById("default-auto"),
+        safeAuto : document.getElementById("safe-auto"),
+        fancyAuto : document.getElementById("fancy-auto"),
     },
 	connecter: {
 		address: document.getElementById('connect-address'),
@@ -61,6 +66,10 @@ let ui = {
         login: document.getElementById('login'),
 	}
 };
+
+ui.robot.defaultAuto.style.display = "none";
+ui.robot.fancyAuto.style.display = "none";
+ui.robot.safeAuto.style.display = "none";
 
 NetworkTables.addRobotConnectionListener(onRobotConnection, false);
 
@@ -124,6 +133,44 @@ function fullRender(){
 ui.robot.gyroReset.onclick = () => {
     console.log("NavX Reset");
     sendMessage("gyroReset", 'true');
+}
+
+ui.robot.autoToggle.onclick = () => {
+    console.log("Auto Toggled On")
+    const mode = (ui.robot.defaultAuto.style.display === "block") ? "none" : "block";
+    ui.robot.defaultAuto.style.display = mode;
+    ui.robot.fancyAuto.style.display = mode;
+    ui.robot.safeAuto.style.display = mode;
+}
+
+function onAutoChange(){
+    const auto = NetworkTables.getValue('' + addresses.auto);
+    console.log("Auto equals: " + auto);
+    if (auto === "default") {
+        ui.robot.defaultAuto.style.color = "green";
+        ui.robot.fancyAuto.style.color = "black";
+        ui.robot.safeAuto.style.color = "black";
+    } else if (auto === "fancy") {
+        ui.robot.defaultAuto.style.color = "black";
+        ui.robot.fancyAuto.style.color = "green";
+        ui.robot.safeAuto.style.color = "black";
+    } else if (auto === "safe") {
+        ui.robot.defaultAuto.style.color = "black";
+        ui.robot.fancyAuto.style.color = "black";
+        ui.robot.safeAuto.style.color = "green";
+    }
+}
+
+ui.robot.safeAuto.onclick = () => {
+    sendMessage("setAuto", "safe")
+}
+
+ui.robot.fancyAuto.onclick = () => {
+    sendMessage("setAuto", "fancy")
+}
+
+ui.robot.defaultAuto.onclick = () => {
+    sendMessage("setAuto", "default")
 }
 
 function renderRobot(){
@@ -231,8 +278,14 @@ function renderTimer(){
     if (seconds.length === 1){
         seconds = '0' + seconds
     }
-    let text = '' + Math.floor(time/60) + ':' + seconds;
-    ct.fillText(text, max/2, max/2+20);//30px text, 15px ajustment?
+    if (time === -1) {
+        let text = "no"
+        ct.fillText(text, max/2, max/2+20);
+    }else {
+        let text = '' + Math.floor(time/60) + ':' + seconds;
+        ct.fillText(text, max/2, max/2+20);
+    }
+    //ct.fillText(text, max/2, max/2+20);//30px text, 15px ajustment?
 
     // console.log(NetworkTables.getValue('' + addresses.robot.isField))
 }
@@ -262,6 +315,10 @@ function addNetworkTables(){
     NetworkTables.addKeyListener('' + addresses.lemons,()=>{
         renderRobot();
     });
+    NetworkTables.addKeyListener('' + addresses.auto,()=>{
+        onAutoChange();
+        renderRobot();
+    });
     setMessageListener("ping", (value) => { 
         console.log("Handshake:" + value);
     } );
@@ -279,7 +336,8 @@ function setMessageListener(path, func) {
 }
 
 function sendMessage(path, value){
-    NetworkTables.putValue('/cob/messages/roborio/' + path, value)
+    console.log("sending message: " + path + ":" + value);
+    NetworkTables.putValue('/cob/messages/roborio/' + path, value);
 }
 
 sendMessage("gnip", "Hello")
