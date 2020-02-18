@@ -17,6 +17,7 @@ let addresses = {
         flywheelImage: "/cob/flywheel/image",
     },
     auto: "/cob/auto/in-use",
+    autoList: "/cob/auto/list"
 };
 
 let messages = {
@@ -39,6 +40,7 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.flywheel.flywheelImage, false);
     NetworkTables.putValue(addresses.lemons, false);
     NetworkTables.putValue(addresses.auto, "unknown");
+    NetworkTables.putValue(addresses.autoList, "unknown,");
 }
 
 let ui = {
@@ -56,9 +58,9 @@ let ui = {
         flywheelImageOff : document.getElementById("flywheeloff-img"),
         lemon : document.getElementById("lemons-img"),
         autoToggle : document.getElementById("auto-toggle"),
-        defaultAuto : document.getElementById("default-auto"),
-        safeAuto : document.getElementById("safe-auto"),
-        fancyAuto : document.getElementById("fancy-auto"),
+        //defaultAuto : document.getElementById("default-auto"),
+        //safeAuto : document.getElementById("safe-auto"),
+        //fancyAuto : document.getElementById("fancy-auto"),
     },
 	connecter: {
 		address: document.getElementById('connect-address'),
@@ -67,9 +69,9 @@ let ui = {
 	}
 };
 
-ui.robot.defaultAuto.style.display = "none";
+/*ui.robot.defaultAuto.style.display = "none";
 ui.robot.fancyAuto.style.display = "none";
-ui.robot.safeAuto.style.display = "none";
+ui.robot.safeAuto.style.display = "none";*/
 
 NetworkTables.addRobotConnectionListener(onRobotConnection, false);
 
@@ -135,15 +137,15 @@ ui.robot.gyroReset.onclick = () => {
     sendMessage("gyroReset", 'true');
 }
 
-ui.robot.autoToggle.onclick = () => {
+/*ui.robot.autoToggle.onclick = () => {
     console.log("Auto Toggled On")
     const mode = (ui.robot.defaultAuto.style.display === "block") ? "none" : "block";
     ui.robot.defaultAuto.style.display = mode;
     ui.robot.fancyAuto.style.display = mode;
     ui.robot.safeAuto.style.display = mode;
-}
+}*/
 
-function onAutoChange(){
+/*function onAutoChange(){
     const auto = NetworkTables.getValue('' + addresses.auto);
     console.log("Auto equals: " + auto);
     if (auto === "default") {
@@ -159,9 +161,9 @@ function onAutoChange(){
         ui.robot.fancyAuto.style.color = "black";
         ui.robot.safeAuto.style.color = "green";
     }
-}
+}*/
 
-ui.robot.safeAuto.onclick = () => {
+/*ui.robot.safeAuto.onclick = () => {
     sendMessage("setAuto", "safe")
 }
 
@@ -171,6 +173,53 @@ ui.robot.fancyAuto.onclick = () => {
 
 ui.robot.defaultAuto.onclick = () => {
     sendMessage("setAuto", "default")
+}*/
+
+const availableRoutes = ["fancy","simple","default","debug"]
+availableRoutes.forEach(makeAuto);
+
+availableRoutes.forEach(startAuto);
+function startAuto (item){
+    document.getElementById(item).style.display = "none"
+}
+
+function makeAuto (item) {
+    const routes = document.createElement("button");
+    const div = document.getElementById("auto-routes")
+    routes.classList.add("route-button");
+    console.log(item);
+    routes.id = item;
+    routes.innerText = item
+    div.appendChild(routes)
+    routes.onclick  = () => {
+        sendMessage("setAuto", item)
+    }
+}
+ui.robot.autoToggle.onclick = () => {
+    console.log("Auto Toggled On")
+    availableRoutes.forEach(toggleAuto)
+}
+
+function onAutoChange(){
+    const auto = NetworkTables.getValue('' + addresses.auto);
+    console.log("Auto equals: " + auto);
+    availableRoutes.forEach(findCurrentAuto)
+}
+
+function findCurrentAuto (item){
+    const auto = NetworkTables.getValue('' + addresses.auto);
+    if (auto === item) {
+        console.log(item + " is selected")
+        document.getElementById(item).style.color = "green"
+    } else {
+        console.log(item + " is not selected")
+        document.getElementById(item).style.color = "black"
+    }
+}
+
+function toggleAuto (item) {
+    const mode = (document.getElementById(item).style.display === "block") ? "none" : "block";
+    document.getElementById(item).style.display = mode;
 }
 
 function renderRobot(){
@@ -190,7 +239,7 @@ function renderRobot(){
         ui.robot.flywheelImage.style.opacity = 1
         ui.robot.flywheelImageOff.style.opacity = 0      
     }else if (flywheelStatus === false){
-        ui.robot.wu.innerText = NetworkTables.getValue('' + addresses.flywheel.wu);
+        ui.robot.wu.innerText = 0;
         ui.robot.flywheelImageOff.style.opacity = 1      
         ui.robot.flywheelImage.style.opacity = 0
     }
