@@ -234,12 +234,12 @@ function renderRobot(){
     ui.robot.image.style.transform = "rotate("+ angle +"deg)"
 
     let flywheelStatus = NetworkTables.getValue('' + addresses.flywheel.flywheelImage);
+    ui.robot.wu.innerText = NetworkTables.getValue('' + addresses.flywheel.wu);
     if (flywheelStatus === true){
-        ui.robot.wu.innerText = NetworkTables.getValue('' + addresses.flywheel.wu);
         ui.robot.flywheelImage.style.opacity = 1
         ui.robot.flywheelImageOff.style.opacity = 0      
     }else if (flywheelStatus === false){
-        ui.robot.wu.innerText = 0;
+        //ui.robot.wu.innerText = 0;
         ui.robot.flywheelImageOff.style.opacity = 1      
         ui.robot.flywheelImage.style.opacity = 0
     }
