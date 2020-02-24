@@ -9,42 +9,52 @@
 
 <body>
 
-      <canvas style="position: absolute; top: 140px; left: 480px;" id="timer" width="230px" height="230px">Ya need html5</canvas>
-      
-      <div style="display: flex; align-items: center; justify-content: center; position: absolute; top: 400px; left: 350px; width: 500px;">
-        <div id="robot-mode" style=" font-size: 50px; ">
-            xxx
-        </div>
-      </div>
 
-      <div style="display: flex; align-items: center; justify-content: center; position: absolute; top: 75px; left: 723px; width: 500px; z-index: 50;">
-        <div id="flywheel-wu" style=" font-size: 50px; ">
-            xxx
-        </div>
-      </div>
+  <canvas style="position: absolute; top: 140px; left: 480px;" id="timer" width="230px" height="230px">Ya need html5</canvas>
+  
+  <div style="display: flex; align-items: center; justify-content: center; position: absolute; top: 400px; left: 350px; width: 500px;">
+    <div id="robot-mode" style=" font-size: 50px; ">
+        xxx
+    </div>
+  </div>
 
-      <div>
-        <img style="position: absolute; top: 5px; left: 870px; width: 200px; height: 200;" src="../res/flywheel.png" id="flywheel-img">
-      </div>
+  <div style="display: flex; align-items: center; justify-content: center; position: absolute; top: 75px; left: 723px; width: 500px; z-index: 50;">
+    <div id="flywheel-wu" style=" font-size: 50px; ">
+        xxx
+    </div>
+  </div>
 
-      <div>
-        <img style="position: absolute; top: 5px; left: 870px; width: 200px; height: 200;" src="../res/flywheeloff.png" id="flywheeloff-img">
-      </div>
-      
-      <div>
-        <img style="position: absolute; top: 220px; left: 870px; width: 200px; height: 200;" src="../res/whenlifegivesyoulemons,gogetmorepower.png" id="lemons-img">
-      </div>
+  <div>
+    <img style="position: absolute; top: 5px; left: 870px; width: 200px; height: 200;" src="../res/flywheel.png" id="flywheel-img">
+  </div>
 
-      <div>
-        <button id="gyroreset" style="background: transparent; border: none !important;"><img style="position: absolute; top: 35px; left: 50px;" src="../res/robot.png" id="robot"/></button>
-      </div>
+  <div>
+    <img style="position: absolute; top: 5px; left: 870px; width: 200px; height: 200;" src="../res/flywheeloff.png" id="flywheeloff-img">
+  </div>
+  
+  <div>
+    <img style="position: absolute; top: 220px; left: 870px; width: 200px; height: 200;" src="../res/whenlifegivesyoulemons,gogetmorepower.png" id="lemons-img">
+  </div>
 
-      <div id="auto-routes" style="
-      width: 500px; height: 100px; position: absolute; top: 40px; left: 350px; display: flex; flex-direction: row; align-items: center; justify-content: center;"></div>
-      
-      <div>
-        <button id="auto-toggle" style="position: absolute; top: 50px; left: 550px; width: 100px; height: 350; text-size-adjust: 50px;">Auto</button>
-      </div>
+  <div>
+    <button id="gyroreset" style="background: transparent; border: none !important;"><img style="position: absolute; top: 35px; left: 50px;" src="../res/robot.png" id="robot"/></button>
+  </div>
+
+  <div id="auto-routes" style="
+  width: 500px; height: 100px; position: absolute; top: 15px; left: 350px; display: flex; flex-direction: row; align-items: center; justify-content: center;"></div>
+  
+  <div style="position: absolute; top: 25px; left: 310px;">
+    <form onsubmit="return console.sendNewWait();">
+      <label for="auto-delay">Set Delay:</label><br>
+      <input type="text" id="auto-delay"><br>
+      <input type="submit" id="submit-delay">
+      <p id="current-delay">xxx</p>
+    </form>
+  </div>
+
+  <div>
+    <button id="auto-toggle" style="position: absolute; top: 20px; left: 550px; width: 100px; height: 350; text-size-adjust: 50px;">Auto</button>
+  </div>
 
   <div id="login" class="overlay" style="z-index: 3">
     <!-- Overlay content -->

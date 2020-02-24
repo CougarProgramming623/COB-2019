@@ -17,7 +17,7 @@ let addresses = {
         flywheelImage: "/cob/flywheel/image",
     },
     auto: "/cob/auto/in-use",
-    autoList: "/cob/auto/list"
+    currentDelay: "/cob/auto/current-delay",
 };
 
 let messages = {
@@ -28,6 +28,7 @@ let messages = {
         gnip: "/cob/messages/roborio/gnip",
         gyroReset: "/cob/messages/roborio/gyroReset",
         setAuto: "/cob/messages/roborio/setAuto",
+        autoDelay: "/cob/messages/roborio/delay"
     }
 };
 
@@ -40,7 +41,7 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.flywheel.flywheelImage, false);
     NetworkTables.putValue(addresses.lemons, false);
     NetworkTables.putValue(addresses.auto, "unknown");
-    NetworkTables.putValue(addresses.autoList, "unknown,");
+    NetworkTables.putValue(addresses.currentDelay, 0)
 }
 
 let ui = {
@@ -58,6 +59,9 @@ let ui = {
         flywheelImageOff : document.getElementById("flywheeloff-img"),
         lemon : document.getElementById("lemons-img"),
         autoToggle : document.getElementById("auto-toggle"),
+        autoDelay : document.getElementById("auto-delay"),
+        currentDelay : document.getElementById("current-delay"),
+        submitDelay : document.getElementById("submit-delay")
         //defaultAuto : document.getElementById("default-auto"),
         //safeAuto : document.getElementById("safe-auto"),
         //fancyAuto : document.getElementById("fancy-auto"),
@@ -136,6 +140,12 @@ ui.robot.gyroReset.onclick = () => {
     console.log("NavX Reset");
     sendMessage("gyroReset", 'true');
 }
+
+console.sendNewWait  = () => {
+    sendMessage("delay", '' + ui.robot.autoDelay.value);
+    return false;
+}
+
 
 /*ui.robot.autoToggle.onclick = () => {
     console.log("Auto Toggled On")
@@ -228,6 +238,9 @@ function renderRobot(){
         //if not connected, we can't render this - just to be safe
         return
     }
+
+    let currentDelayD = NetworkTables.getValue('' + addresses.currentDelay);
+    ui.robot.currentDelay.innerText = ("Current Delay: " + currentDelayD);
 
     let angle = NetworkTables.getValue('' + addresses.location.rotation);
     angle = (angle + 360) % 360;
@@ -354,6 +367,10 @@ function addNetworkTables(){
     });
     NetworkTables.addKeyListener('' + addresses.mode,()=>{
         renderTimer();
+    });
+    NetworkTables.addKeyListener('' + addresses.currentDelay,()=>{
+        renderRobot();
+        console.log("Updated Auto Delay")
     });
     NetworkTables.addKeyListener('' + addresses.flywheel.wu,()=>{
         renderRobot();
