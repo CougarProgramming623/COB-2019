@@ -18,6 +18,7 @@ let addresses = {
     },
     auto: "/cob/auto/in-use",
     currentDelay: "/cob/auto/current-delay",
+    canVision: "/cob/can-vision",
 };
 
 let messages = {
@@ -41,7 +42,8 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.flywheel.flywheelImage, false);
     NetworkTables.putValue(addresses.lemons, false);
     NetworkTables.putValue(addresses.auto, "unknown");
-    NetworkTables.putValue(addresses.currentDelay, 0)
+    NetworkTables.putValue(addresses.currentDelay, 0);
+    NetworkTables.putValue(addresses.canVision, false);
 }
 
 let ui = {
@@ -61,10 +63,7 @@ let ui = {
         autoToggle : document.getElementById("auto-toggle"),
         autoDelay : document.getElementById("auto-delay"),
         currentDelay : document.getElementById("current-delay"),
-        submitDelay : document.getElementById("submit-delay")
-        //defaultAuto : document.getElementById("default-auto"),
-        //safeAuto : document.getElementById("safe-auto"),
-        //fancyAuto : document.getElementById("fancy-auto"),
+        submitDelay : document.getElementById("submit-delay"),
     },
 	connecter: {
 		address: document.getElementById('connect-address'),
@@ -145,7 +144,6 @@ console.sendNewWait  = () => {
     sendMessage("delay", '' + ui.robot.autoDelay.value);
     return false;
 }
-
 
 /*ui.robot.autoToggle.onclick = () => {
     console.log("Auto Toggled On")
@@ -357,6 +355,15 @@ function addNetworkTables(){
     NetworkTables.addKeyListener('' + addresses.fms.timeLeft,()=>{
         renderTimer();
     },false);
+
+    NetworkTables.addKeyListener('' + addresses.canVision,()=>{
+        console.log("did stuff");
+        if (NetworkTables.getValue(addresses.canVision) === true) {
+            document.body.style.backgroundColor = "rgb(128, 0, 32)";
+        } else {
+            document.body.style.backgroundColor = "white";
+        }
+    });
 
     NetworkTables.addKeyListener('' + addresses.location.rotation,()=>{
         renderRobot();
