@@ -11,7 +11,6 @@ let addresses = {
         isRed: "/FMSInfo/IsRedAlliance",
     },
     mode: "/cob/mode", //0 = Field Orient, 1 = Robot Orient, 2 = Auto, 3 = Vision, 4 = Climb, 5 = Disabled
-    lemons: "/cob/lemons",
     flywheel: {
         wu: "/cob/flywheel/wu",
         flywheelImage: "/cob/flywheel/image",
@@ -29,7 +28,8 @@ let messages = {
         gnip: "/cob/messages/roborio/gnip",
         gyroReset: "/cob/messages/roborio/gyroReset",
         setAuto: "/cob/messages/roborio/setAuto",
-        autoDelay: "/cob/messages/roborio/delay"
+        autoDelay: "/cob/messages/roborio/delay",
+        removeLemon: "/cob/messages/roborio/removeLemon",
     }
 };
 
@@ -40,7 +40,6 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.mode, 5);
     NetworkTables.putValue(addresses.flywheel.wu, 0);
     NetworkTables.putValue(addresses.flywheel.flywheelImage, false);
-    NetworkTables.putValue(addresses.lemons, false);
     NetworkTables.putValue(addresses.auto, "unknown");
     NetworkTables.putValue(addresses.currentDelay, 0);
     NetworkTables.putValue(addresses.canVision, 0);
@@ -60,6 +59,7 @@ let ui = {
         flywheelImage : document.getElementById("flywheel-img"),
         flywheelImageOff : document.getElementById("flywheeloff-img"),
         lemon : document.getElementById("lemons-img"),
+        lemonButton : document.getElementById("lemon-button"),
         autoToggle : document.getElementById("auto-toggle"),
         autoDelay : document.getElementById("auto-delay"),
         currentDelay : document.getElementById("current-delay"),
@@ -143,6 +143,11 @@ ui.robot.gyroReset.onclick = () => {
 console.sendNewWait  = () => {
     sendMessage("delay", '' + ui.robot.autoDelay.value);
     return false;
+}
+
+ui.robot.lemonButton.onclick = () => {
+    console.log("Removing Lems");
+    sendMessage("removeLemon", "wedonttakekindlytoyourlemonsaroundhere")
 }
 
 /*ui.robot.autoToggle.onclick = () => {
@@ -255,12 +260,6 @@ function renderRobot(){
         ui.robot.flywheelImage.style.opacity = 0
     }
 
-    let lemonStatus = NetworkTables.getValue('' + addresses.lemons);
-    if (lemonStatus === false){
-        ui.robot.lemon.style.opacity = 0
-    }else if (lemonStatus === true){
-        ui.robot.lemon.style.opacity = 1
-    }
 }
 
 function renderTimer(){
@@ -383,9 +382,6 @@ function addNetworkTables(){
         renderRobot();
     });
     NetworkTables.addKeyListener('' + addresses.flywheel.flywheelImage,()=>{
-        renderRobot();
-    });
-    NetworkTables.addKeyListener('' + addresses.lemons,()=>{
         renderRobot();
     });
     NetworkTables.addKeyListener('' + addresses.auto,()=>{
