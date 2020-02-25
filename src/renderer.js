@@ -18,7 +18,7 @@ let addresses = {
     },
     auto: "/cob/auto/in-use",
     currentDelay: "/cob/auto/current-delay",
-    canVision: "/cob/can-vision",
+    canVision: "/limelight/tv",
 };
 
 let messages = {
@@ -43,7 +43,7 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.lemons, false);
     NetworkTables.putValue(addresses.auto, "unknown");
     NetworkTables.putValue(addresses.currentDelay, 0);
-    NetworkTables.putValue(addresses.canVision, false);
+    NetworkTables.putValue(addresses.canVision, 0);
 }
 
 let ui = {
@@ -358,8 +358,8 @@ function addNetworkTables(){
 
     NetworkTables.addKeyListener('' + addresses.canVision,()=>{
         console.log("did stuff");
-        if (NetworkTables.getValue(addresses.canVision) === true) {
-            document.body.style.backgroundColor = "rgb(128, 0, 32)";
+        if (NetworkTables.getValue(addresses.canVision) === 1) {
+            document.body.style.backgroundColor = "rgb(150, 0, 32)";
         } else {
             document.body.style.backgroundColor = "white";
         }
