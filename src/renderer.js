@@ -18,6 +18,7 @@ let addresses = {
     auto: "/cob/auto/in-use",
     currentDelay: "/cob/auto/current-delay",
     canVision: "/limelight/tv",
+    cobCheck: "/cob/cob-check",
 };
 
 let messages = {
@@ -43,6 +44,7 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.auto, "unknown");
     NetworkTables.putValue(addresses.currentDelay, 0);
     NetworkTables.putValue(addresses.canVision, 0);
+    NetworkTables.putValue(addresses.cobCheck, 0)
 }
 
 let ui = {
@@ -64,6 +66,7 @@ let ui = {
         autoDelay : document.getElementById("auto-delay"),
         currentDelay : document.getElementById("current-delay"),
         submitDelay : document.getElementById("submit-delay"),
+        cobCheckDiv : document.getElementById("cob-check"),
     },
 	connecter: {
 		address: document.getElementById('connect-address'),
@@ -387,6 +390,9 @@ function addNetworkTables(){
     NetworkTables.addKeyListener('' + addresses.auto,()=>{
         onAutoChange();
         renderRobot();
+    });
+    NetworkTables.addKeyListener('' + addresses.cobCheck,()=>{
+       ui.robot.cobCheckDiv.innerText = NetworkTables.getValue(addresses.cobCheck);
     });
     setMessageListener("ping", (value) => { 
         console.log("Handshake:" + value);
