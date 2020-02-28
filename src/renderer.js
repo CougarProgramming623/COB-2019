@@ -191,7 +191,7 @@ ui.robot.defaultAuto.onclick = () => {
     sendMessage("setAuto", "default")
 }*/
 
-const availableRoutes = ["fancy","simple","default","debug"]
+const availableRoutes = ["nop","safe","shoot&back-robot", "shoot&back-field", "shoot&forward-robot"]
 availableRoutes.forEach(makeAuto);
 
 availableRoutes.forEach(startAuto);
