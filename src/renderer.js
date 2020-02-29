@@ -191,7 +191,7 @@ ui.robot.defaultAuto.onclick = () => {
     sendMessage("setAuto", "default")
 }*/
 
-const availableRoutes = ["nop","safe","shoot&back-robot", "shoot&back-field", "shoot&forward-robot"]
+const availableRoutes = ["nop", "shootAndBackwards", "shootAndForwards", "onlyShoot", "onlyShootNoAlign", "onlyBackwards"]
 availableRoutes.forEach(makeAuto);
 
 availableRoutes.forEach(startAuto);
