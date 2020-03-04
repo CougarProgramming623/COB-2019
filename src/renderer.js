@@ -14,6 +14,7 @@ let addresses = {
     flywheel: {
         wu: "/cob/flywheel/wu",
         flywheelImage: "/cob/flywheel/image",
+        set: "cob/flywheel/set",
     },
     auto: "/cob/auto/in-use",
     currentDelay: "/cob/auto/current-delay",
@@ -23,7 +24,8 @@ let addresses = {
 
 let messages = {
     cob : {
-        ping: "/cob/messages/cob/ping"
+        ping: "/cob/messages/cob/ping",
+        receiveAuto: "/cob/messages/cob/receiveAuto",
     },
     roborio : {
         gnip: "/cob/messages/roborio/gnip",
@@ -31,6 +33,7 @@ let messages = {
         setAuto: "/cob/messages/roborio/setAuto",
         autoDelay: "/cob/messages/roborio/delay",
         removeLemon: "/cob/messages/roborio/removeLemon",
+        requestAuto: "/cob/messages/roborio/requestAuto",
     }
 };
 
@@ -44,7 +47,8 @@ function initAllDatapoints(){
     NetworkTables.putValue(addresses.auto, "unknown");
     NetworkTables.putValue(addresses.currentDelay, 0);
     NetworkTables.putValue(addresses.canVision, 0);
-    NetworkTables.putValue(addresses.cobCheck, 0)
+    NetworkTables.putValue(addresses.cobCheck, 0);
+    NetworkTables.putValue(addresses.flywheel.set, 0);
 }
 
 let ui = {
@@ -58,6 +62,7 @@ let ui = {
         image : document.getElementById('robot'),
         gyroReset : document.getElementById('gyroreset'),
         wu : document.getElementById('flywheel-wu'),
+        set : document.getElementById('flywheel-set'),
         flywheelImage : document.getElementById("flywheel-img"),
         flywheelImageOff : document.getElementById("flywheeloff-img"),
         lemon : document.getElementById("lemons-img"),
@@ -191,51 +196,51 @@ ui.robot.defaultAuto.onclick = () => {
     sendMessage("setAuto", "default")
 }*/
 
-const availableRoutes = ["nop", "shootAndBackwards", "shootAndForwards", "onlyShoot", "onlyShootNoAlign", "onlyBackwards"]
-availableRoutes.forEach(makeAuto);
 
-availableRoutes.forEach(startAuto);
-function startAuto (item){
-    document.getElementById(item).style.display = "none"
-}
-
-function makeAuto (item) {
-    const routes = document.createElement("button");
-    const div = document.getElementById("auto-routes")
-    routes.classList.add("route-button");
-    console.log(item);
-    routes.id = item;
-    routes.innerText = item
-    div.appendChild(routes)
-    routes.onclick  = () => {
-        sendMessage("setAuto", item)
-    }
+function setUpAllAuto(routes){
+    routes.forEach(item =>  {
+        if(document.getElementById(item) !== undefined) continue;
+        const routes = document.createElement("button");
+        const div = document.getElementById("auto-routes")
+        routes.classList.add("route-button");
+        console.log(item);
+        routes.id = item;
+        routes.innerText = item
+        div.appendChild(routes)
+        routes.onclick  = () => {
+            sendMessage("setAuto", item)
+        }
+        document.getElementById(item).style.display = "none"
+    })
 }
 ui.robot.autoToggle.onclick = () => {
     console.log("Auto Toggled On")
-    availableRoutes.forEach(toggleAuto)
+    sendMessage("requestAuto", "true")
 }
 
 function onAutoChange(){
     const auto = NetworkTables.getValue('' + addresses.auto);
     console.log("Auto equals: " + auto);
-    availableRoutes.forEach(findCurrentAuto)
+    document.getElementsByClassName("route-button").forEach(findCurrentAuto)
 }
 
 function findCurrentAuto (item){
     const auto = NetworkTables.getValue('' + addresses.auto);
-    if (auto === item) {
+    if (auto === item.id) {
         console.log(item + " is selected")
-        document.getElementById(item).style.color = "green"
+        item.style.color = "green"
     } else {
         console.log(item + " is not selected")
-        document.getElementById(item).style.color = "black"
+        item.style.color = "black"
     }
 }
 
-function toggleAuto (item) {
-    const mode = (document.getElementById(item).style.display === "block") ? "none" : "block";
-    document.getElementById(item).style.display = mode;
+
+function toggleAuto () {
+    document.getElementsByClassName("route-button").forEach(item => {
+        const mode = (item.style.display === "block") ? "none" : "block";
+        document.getElementById(item).style.display = mode;
+    });
 }
 
 function renderRobot(){
@@ -391,6 +396,10 @@ function addNetworkTables(){
         onAutoChange();
         renderRobot();
     });
+    NetworkTables.addKeyListener('' + addresses.flywheel.set,()=>{
+        renderRobot();
+        ui.robot.set.innerText = NetworkTables.getValue('' + addresses.flywheel.set);
+    });
     NetworkTables.addKeyListener('' + addresses.cobCheck,()=>{
        ui.robot.cobCheckDiv.innerText = NetworkTables.getValue(addresses.cobCheck);
     });
@@ -400,6 +409,13 @@ function addNetworkTables(){
     setMessageListener("gyroReset-ack", (value) => {
         console.log(value);
         //sendMessage("gyroReset", false);
+    })
+    setMessageListener("receiveAuto", (value) => {
+        console.log(value)  
+        //"route 1, route 2, route 3"
+        const availableRoutes = value.split(", ")
+        setUpAllAuto(availableRoutes);
+        availableRoutes.forEach(toggleAuto);
     })
 }
 
