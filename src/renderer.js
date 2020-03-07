@@ -420,7 +420,7 @@ function addNetworkTables(){
     // })
 }
 
-const availableRoutes = ["nop","shoot&back"];
+const availableRoutes = ["nop","shoot&back", "5ballauto"];
 setUpAllAuto();
 availableRoutes.map(i => document.getElementById(i)).forEach(toggleAuto);
 
