@@ -197,32 +197,33 @@ ui.robot.defaultAuto.onclick = () => {
 }*/
 
 
-function setUpAllAuto(routes){
-    return
-    routes.forEach(item =>  {
-        if(document.getElementById(item) !== undefined) continue;
-        const routes = document.createElement("button");
-        const div = document.getElementById("auto-routes")
-        routes.classList.add("route-button");
-        console.log(item);
-        routes.id = item;
-        routes.innerText = item
-        div.appendChild(routes)
-        routes.onclick  = () => {
-            sendMessage("setAuto", item)
+function setUpAllAuto(){
+    availableRoutes.forEach(item =>  {
+        if(document.getElementById(item) === null) {
+            const routes = document.createElement("button");
+            const div = document.getElementById("auto-routes")
+            routes.classList.add("route-button");
+            console.log("adding button:" + item);
+            routes.id = item;
+            routes.innerText = item
+            div.appendChild(routes)
+            routes.onclick  = () => {
+                sendMessage("setAuto", item)
+            }
+            document.getElementById(item).style.display = "none"
         }
-        document.getElementById(item).style.display = "none"
     })
 }
 ui.robot.autoToggle.onclick = () => {
     console.log("Auto Toggled On")
-    sendMessage("requestAuto", "true")
+    // sendMessage("requestAuto", "true")
+    availableRoutes.forEach(toggleAuto)
 }
 
 function onAutoChange(){
     const auto = NetworkTables.getValue('' + addresses.auto);
     console.log("Auto equals: " + auto);
-    routes.forEach(findCurrentAuto)
+    availableRoutes.map(i => document.getElementById(i)).forEach(findCurrentAuto)
 }
 
 function findCurrentAuto (item){
@@ -236,11 +237,11 @@ function findCurrentAuto (item){
     }
 }
 
-function toggleAuto () {
-    routes.forEach(item => {
-        const mode = (item.style.display === "block") ? "none" : "block";
-        document.getElementById(item).style.display = mode;
-    });
+function toggleAuto (item) {
+    let elem = document.getElementById(item)
+    if(elem === null) return;
+    const mode = (elem.style.display === "block") ? "none" : "block";
+    elem.style.display = mode;
 }
 
 function renderRobot(){
@@ -392,10 +393,10 @@ function addNetworkTables(){
     NetworkTables.addKeyListener('' + addresses.flywheel.flywheelImage,()=>{
         renderRobot();
     });
-    // NetworkTables.addKeyListener('' + addresses.auto,()=>{
-    //     onAutoChange();
-    //     renderRobot();
-    // });
+    NetworkTables.addKeyListener('' + addresses.auto,()=>{
+        onAutoChange();
+        renderRobot();
+    });
     NetworkTables.addKeyListener('' + addresses.flywheel.set,()=>{
         renderRobot();
         ui.robot.set.innerText = Math.floor(NetworkTables.getValue('' + addresses.flywheel.set));
@@ -410,14 +411,18 @@ function addNetworkTables(){
         console.log(value);
         //sendMessage("gyroReset", false);
     })
-    setMessageListener("receiveAuto", (value) => {
-        console.log(value)  
-        //"route 1, route 2, route 3"
-        const availableRoutes = value.split(",")
-        setUpAllAuto(availableRoutes);
-        availableRoutes.forEach(toggleAuto);
-    })
+    // setMessageListener("receiveAuto", (value) => {
+    //     console.log(value)  
+    //     //"route 1, route 2, route 3"
+    //     const availableRoutes = value.split(",")
+    //     setUpAllAuto(availableRoutes);
+    //     availableRoutes.forEach(toggleAuto);
+    // })
 }
+
+const availableRoutes = ["nop","shoot&back"];
+setUpAllAuto();
+availableRoutes.map(i => document.getElementById(i)).forEach(toggleAuto);
 
 function setMessageListener(path, func) {
     NetworkTables.addKeyListener('/cob/messages/cob/' + path,(key,value)=>{
