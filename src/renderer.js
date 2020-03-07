@@ -14,7 +14,7 @@ let addresses = {
     flywheel: {
         wu: "/cob/flywheel/wu",
         flywheelImage: "/cob/flywheel/image",
-        set: "cob/flywheel/set",
+        set: "/cob/flywheel/set",
     },
     auto: "/cob/auto/in-use",
     currentDelay: "/cob/auto/current-delay",
@@ -23,7 +23,7 @@ let addresses = {
 };
 
 let messages = {
-    cob : {
+    cob : { 
         ping: "/cob/messages/cob/ping",
         receiveAuto: "/cob/messages/cob/receiveAuto",
     },
@@ -198,6 +198,7 @@ ui.robot.defaultAuto.onclick = () => {
 
 
 function setUpAllAuto(routes){
+    return
     routes.forEach(item =>  {
         if(document.getElementById(item) !== undefined) continue;
         const routes = document.createElement("button");
@@ -221,7 +222,7 @@ ui.robot.autoToggle.onclick = () => {
 function onAutoChange(){
     const auto = NetworkTables.getValue('' + addresses.auto);
     console.log("Auto equals: " + auto);
-    document.getElementsByClassName("route-button").forEach(findCurrentAuto)
+    routes.forEach(findCurrentAuto)
 }
 
 function findCurrentAuto (item){
@@ -235,9 +236,8 @@ function findCurrentAuto (item){
     }
 }
 
-
 function toggleAuto () {
-    document.getElementsByClassName("route-button").forEach(item => {
+    routes.forEach(item => {
         const mode = (item.style.display === "block") ? "none" : "block";
         document.getElementById(item).style.display = mode;
     });
@@ -392,13 +392,13 @@ function addNetworkTables(){
     NetworkTables.addKeyListener('' + addresses.flywheel.flywheelImage,()=>{
         renderRobot();
     });
-    NetworkTables.addKeyListener('' + addresses.auto,()=>{
-        onAutoChange();
-        renderRobot();
-    });
+    // NetworkTables.addKeyListener('' + addresses.auto,()=>{
+    //     onAutoChange();
+    //     renderRobot();
+    // });
     NetworkTables.addKeyListener('' + addresses.flywheel.set,()=>{
         renderRobot();
-        ui.robot.set.innerText = NetworkTables.getValue('' + addresses.flywheel.set);
+        ui.robot.set.innerText = Math.floor(NetworkTables.getValue('' + addresses.flywheel.set));
     });
     NetworkTables.addKeyListener('' + addresses.cobCheck,()=>{
        ui.robot.cobCheckDiv.innerText = NetworkTables.getValue(addresses.cobCheck);
@@ -413,7 +413,7 @@ function addNetworkTables(){
     setMessageListener("receiveAuto", (value) => {
         console.log(value)  
         //"route 1, route 2, route 3"
-        const availableRoutes = value.split(", ")
+        const availableRoutes = value.split(",")
         setUpAllAuto(availableRoutes);
         availableRoutes.forEach(toggleAuto);
     })
