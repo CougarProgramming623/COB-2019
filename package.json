@@ -6,7 +6,7 @@
     "start": "electron ."
   },
   "devDependencies": {
-    "electron": "^4.2.12"
+    "electron": "^7.2.4"
   },
   "dependencies": {
     "electron-positioner": "^4.1.0",
